@@ -23,7 +23,7 @@ visualization of Batch meta data, and also launching and stopping jobs inside th
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
+			<artifactId>javax.servlet-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.aspectj</groupId>
@@ -36,6 +36,10 @@ visualization of Batch meta data, and also launching and stopping jobs inside th
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -159,8 +163,8 @@ visualization of Batch meta data, and also launching and stopping jobs inside th
 			<version>2.0.0.BUILD-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-asl</artifactId>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
 		</dependency>
 	</dependencies>
 	<build>
