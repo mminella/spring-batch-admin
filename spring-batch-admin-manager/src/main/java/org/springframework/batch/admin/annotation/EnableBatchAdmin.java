@@ -12,6 +12,10 @@ import org.springframework.context.annotation.ImportResource;
  * This annotation is responsible for bootstrapping Spring Batch Admin
  * within an existing web application.
  *
+ * <em>Note:</em>When using with Spring Boot's auto configuration,
+ * HypermediaAutoConfiguration and MultipartAutoConfiguration should be disabled due to
+ * conflicts in configuration.
+ *
  * @author Michael Minella
  * @since 2.0
  */

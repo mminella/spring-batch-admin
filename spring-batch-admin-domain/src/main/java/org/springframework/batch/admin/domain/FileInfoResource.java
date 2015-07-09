@@ -20,7 +20,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.springframework.hateoas.ResourceSupport;
 
 /**
+ * Represents a data file resource.
+ *
  * @author Michael Minella
+ * @since 2.0
  */
 @XmlRootElement
 public class FileInfoResource extends ResourceSupport {

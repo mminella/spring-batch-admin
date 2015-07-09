@@ -11,6 +11,9 @@ visualization of Batch meta data, and also launching and stopping jobs inside th
 		<version>2.0.0.BUILD-SNAPSHOT</version>
 		<relativePath>../spring-batch-admin-parent</relativePath>
 	</parent>
+	<properties>
+		<snippetsDirectory>${project.build.directory}/generated-snippets</snippetsDirectory>
+	</properties>
 	<name>Manager</name>
 	<dependencies>
 		<dependency>
@@ -198,16 +201,68 @@ visualization of Batch meta data, and also launching and stopping jobs inside th
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.restdocs</groupId>
+			<artifactId>spring-restdocs</artifactId>
+			<version>1.0.0.BUILD-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<includes>
+						<include>**/*Documentation.java</include>
+					</includes>
+					<systemPropertyVariables>
+						<org.springframework.restdocs.outputDir>${snippetsDirectory}</org.springframework.restdocs.outputDir>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.asciidoctor</groupId>
+				<artifactId>asciidoctor-maven-plugin</artifactId>
+				<version>1.5.2</version>
+				<executions>
+					<execution>
+						<id>generate-docs</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>process-asciidoc</goal>
+						</goals>
+						<configuration>
+							<backend>html</backend>
+							<doctype>book</doctype>
+							<attributes>
+								<snippets>${snippetsDirectory}</snippets>
+							</attributes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.7</source>
+					<target>1.7</target>
 				</configuration>
+				<!--<executions>-->
+					<!--<execution>-->
+						<!--<id>test-compile</id>-->
+						<!--<phase>process-test-sources</phase>-->
+						<!--<goals>-->
+							<!--<goal>testCompile</goal>-->
+						<!--</goals>-->
+						<!--<configuration>-->
+							<!--<source>1.7</source>-->
+							<!--<target>1.7</target>-->
+						<!--</configuration>-->
+					<!--</execution>-->
+				<!--</executions>-->
 			</plugin>
 			<plugin>
 				<groupId>org.mortbay.jetty</groupId>

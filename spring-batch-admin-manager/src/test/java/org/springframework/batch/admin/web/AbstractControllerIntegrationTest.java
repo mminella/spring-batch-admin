@@ -136,7 +136,7 @@ public class AbstractControllerIntegrationTest {
 	}
 
 	@Autowired
-	private WebApplicationContext wac;
+	protected WebApplicationContext wac;
 
 	@Before
 	public void setupMockMVC() {
