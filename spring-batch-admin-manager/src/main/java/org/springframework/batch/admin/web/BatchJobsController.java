@@ -67,12 +67,12 @@ public class BatchJobsController extends AbstractBatchJobsController {
 			PagedResourcesAssembler<DetailedJobInfo> assembler) {
 		int total = jobService.countJobs();
 		Collection<String> names = jobService.listJobs(pageable.getOffset(), pageable.getPageSize());
-		List<DetailedJobInfo> detailedJobs = new ArrayList<DetailedJobInfo>();
+		List<DetailedJobInfo> detailedJobs = new ArrayList<>();
 		for (String name : names) {
 			detailedJobs.add(getJobInfo(name));
 		}
 		return assembler.toResource(
-				new PageImpl<DetailedJobInfo>(detailedJobs, pageable, total),
+				new PageImpl<>(detailedJobs, pageable, total),
 				jobInfoResourceAssembler);
 	}
 
@@ -86,10 +86,6 @@ public class BatchJobsController extends AbstractBatchJobsController {
 		return getJobInfoResource(jobName);
 	}
 
-	/**
-	 * @param jobName
-	 * @return the detailed job info resource for the given job name.
-	 */
 	private DetailedJobInfoResource getJobInfoResource(String jobName) {
 		return jobInfoResourceAssembler.toResource(getJobInfo(jobName));
 	}

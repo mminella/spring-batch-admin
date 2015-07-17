@@ -16,7 +16,6 @@
 package org.springframework.batch.admin.web;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -34,8 +33,6 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -69,42 +66,39 @@ public class BatchFileController extends AbstractBatchJobsController {
 				fileInfoResourceAssembler);
 	}
 
-	@RequestMapping(value = "", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{pattern}", method = RequestMethod.DELETE)
 	@ResponseStatus(HttpStatus.OK)
-	public FileInfoResource delete(@RequestParam(defaultValue = "**") String pattern) throws Exception {
+	public FileInfoResource delete(@PathVariable String pattern) throws Exception {
 		FileInfo fileInfo = new FileInfo(pattern, "", true, fileService.delete(pattern));
 
 		return fileInfoResourceAssembler.toResource(fileInfo);
 	}
 
 	@RequestMapping(value = "", method = RequestMethod.POST)
-	public String uploadRequest(@RequestParam String path, @RequestParam MultipartFile file, ModelMap model,
-			@RequestParam(defaultValue = "0") int startFile, @RequestParam(defaultValue = "20") int pageSize,
-			@ModelAttribute("date") Date date, Errors errors) throws Exception {
-		return upload(path, file, model, startFile, pageSize, date, errors);
+	public FileInfoResource uploadRequest(ModelMap model, @RequestParam String path, @RequestParam MultipartFile file) throws Exception {
+		return upload(model, path, file);
 	}
 
 	@RequestMapping(value = "/{path}", method = RequestMethod.POST)
-	public String upload(@PathVariable String path, @RequestParam MultipartFile file, ModelMap model,
-			@RequestParam(defaultValue = "0") int startFile, @RequestParam(defaultValue = "20") int pageSize,
-			@ModelAttribute("date") Date date, Errors errors) throws Exception {
+	public FileInfoResource upload( ModelMap model, @PathVariable String path, @RequestParam MultipartFile file) throws Exception {
 
 		String originalFilename = file.getOriginalFilename();
 		if (file.isEmpty()) {
-			errors.reject("file.upload.empty", new Object[] { originalFilename },
-					"File upload was empty for filename=[" + HtmlUtils.htmlEscape(originalFilename) + "]");
 			return null;
+//			errors.reject("file.upload.empty", new Object[] { originalFilename },
+//					"File upload was empty for filename=[" + HtmlUtils.htmlEscape(originalFilename) + "]");
 		}
 
 		try {
 			FileInfo dest = fileService.createFile(path + "/" + originalFilename);
 			file.transferTo(fileService.getResource(dest.getPath()).getFile());
 			fileService.publish(dest);
-			model.put("uploaded", dest.getPath());
+			return fileInfoResourceAssembler.toResource(dest);
 		}
 		catch (IOException e) {
-			errors.reject("file.upload.failed", new Object[] { originalFilename }, "File upload failed for "
-					+ HtmlUtils.htmlEscape(originalFilename));
+			return null;
+//			errors.reject("file.upload.failed", new Object[] { originalFilename }, "File upload failed for "
+//					+ HtmlUtils.htmlEscape(originalFilename));
 		}
 		catch (Exception e) {
 			String message = "File upload failed downstream processing for "
@@ -114,9 +108,8 @@ public class BatchFileController extends AbstractBatchJobsController {
 			} else {
 				logger.info(message);
 			}
-			errors.reject("file.upload.failed.downstream", new Object[] { originalFilename }, message);
+			return null;
+//			errors.reject("file.upload.failed.downstream", new Object[] { originalFilename }, message);
 		}
-
-		return null;
 	}
 }

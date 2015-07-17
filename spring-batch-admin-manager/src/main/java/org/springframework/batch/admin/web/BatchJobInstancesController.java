@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.batch.admin.domain.JobExecutionInfo;
 import org.springframework.batch.admin.domain.JobInstanceInfoResource;
 import org.springframework.batch.admin.domain.NoSuchBatchJobException;
 import org.springframework.batch.admin.domain.NoSuchBatchJobInstanceException;
@@ -68,10 +67,6 @@ public class BatchJobInstancesController extends AbstractBatchJobsController {
 			try {
 				List<JobExecution> jobExecutions = (List<JobExecution>) jobService.getJobExecutionsForJobInstance(
 						jobInstance.getJobName(), jobInstance.getId());
-				List<JobExecutionInfo> jobExecutionInfos = new ArrayList<JobExecutionInfo>();
-				for (JobExecution jobExecution : jobExecutions) {
-					jobExecutionInfos.add(new JobExecutionInfo(jobExecution, timeZone));
-				}
 
 				return jobInstanceInfoResourceAssembler.toResource(new JobInstanceInfo(jobInstance, jobExecutions));
 			}
@@ -97,7 +92,7 @@ public class BatchJobInstancesController extends AbstractBatchJobsController {
 	public PagedResources<JobInstanceInfoResource> instancesForJob(Pageable pageable, PagedResourcesAssembler<JobInstanceInfo> assembler, @RequestParam("jobname") String jobName) {
 
 		try {
-			List<JobInstanceInfo> result = new ArrayList<JobInstanceInfo>();
+			List<JobInstanceInfo> result = new ArrayList<>();
 			long total = jobService.countJobInstances(jobName);
 
 			Collection<JobInstance> jobInstances = jobService.listJobInstances(jobName, pageable.getOffset(), pageable.getPageSize());
@@ -107,7 +102,7 @@ public class BatchJobInstancesController extends AbstractBatchJobsController {
 				result.add(new JobInstanceInfo(jobInstance, jobExecutions));
 			}
 
-			return assembler.toResource(new PageImpl<JobInstanceInfo>(result, pageable, total), jobInstanceInfoResourceAssembler);
+			return assembler.toResource(new PageImpl<>(result, pageable, total), jobInstanceInfoResourceAssembler);
 		}
 		catch (NoSuchJobException e) {
 			throw new NoSuchBatchJobException(jobName);

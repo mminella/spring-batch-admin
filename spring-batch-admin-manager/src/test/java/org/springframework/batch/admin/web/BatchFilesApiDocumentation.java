@@ -15,26 +15,36 @@
  */
 package org.springframework.batch.admin.web;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.RestDocumentation.document;
-import static org.springframework.restdocs.hypermedia.LinkExtractors.halLinks;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.springframework.batch.admin.service.FileInfo;
 import org.springframework.batch.admin.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 /**
  * @author Michael Minella
@@ -49,7 +59,7 @@ public class BatchFilesApiDocumentation extends AbstractApiDocumentation {
 
 	@Test
 	public void testList() throws Exception {
-		List<FileInfo> files = new ArrayList<FileInfo>();
+		List<FileInfo> files = new ArrayList<>();
 		files.add(new FileInfo("foo.txt", "sometimestamp", true, 0));
 		files.add(new FileInfo("bar/foo.txt", "anothertimestamp", false, 0));
 		files.add(new FileInfo("bar/baz.txt", "lasttimestamp", true, 0));
@@ -58,61 +68,41 @@ public class BatchFilesApiDocumentation extends AbstractApiDocumentation {
 
 		mockMvc.perform(
 				get("/batch/files").param("page", "0").param("size", "10").accept(MediaType.APPLICATION_JSON)).andDo(document("file-list")
-				.withQueryParameters(parameterWithName("page").description("Requested page index (0 based)"),
-						parameterWithName("size").description("Number of elements per page"))
-				.withResponseFields(fieldWithPath("pagedResources.content").description("An array of <<file-info,FileInfo resources>>"),
-						fieldWithPath("pagedResources.page.size").description("The requested page size"),
-						fieldWithPath("pagedResources.page.totalElements").description("The total number of elements"),
-						fieldWithPath("pagedResources.page.totalPages").description("The total number of pages"),
-						fieldWithPath("pagedResources.page.number").description("The current page number"))
-				.withLinks(halLinks()));
+                .withQueryParameters(parameterWithName("page").description("Requested page index (0 based)"),
+                        parameterWithName("size").description("Number of elements per page"))
+                .withResponseFields(fieldWithPath("pagedResources.page").description("<<overview-pagination-response>>"),
+                        fieldWithPath("pagedResources.content").description("Array of <<file-resource>>"),
+                        fieldWithPath("pagedResources.links").description("Links to the current page of <<file-resource>>")));
+	}
+
+	@Test
+ 	public void testDelete() throws Exception {
+		when(fileService.delete("*")).thenReturn(3);
+
+		mockMvc.perform(
+          delete("/batch/files/*").accept(MediaType.APPLICATION_JSON)).andDo(print()).andDo(document("file-delete")
+			 .withResponseFields(
+					 fieldWithPath("fileInfoResource").description("<<file-resource>>")
+			 )).andExpect(status().isOk())
+			 .andExpect(jsonPath("$.fileInfoResource.deleteCount", equalTo(3)));
+	}
+
+	@Ignore
+	@Test
+	public void testUploadRequest() throws Exception {
+		File tempFile = File.createTempFile("result", "txt");
+
+		FileInfo fileInfo = new FileInfo(tempFile.getPath());
+		when(fileService.createFile("/foo/bar.txt")).thenReturn(fileInfo);
+		when(fileService.getResource(tempFile.getPath())).thenReturn(new FileSystemResource(tempFile));
+
+		MockMultipartFile file = new MockMultipartFile("file", "bar.txt", "text/plain", "bar".getBytes());
+
+		mockMvc.perform(MockMvcRequestBuilders.fileUpload("/batch/files")
+				.file(file).param("path", "/foo").accept(MediaType.APPLICATION_JSON))
+				.andDo(print())
+		.andDo(document("file-upload-request").withRequestFields(fieldWithPath("path").description("where the file should be uploaded to")));
+
+		verify(fileService).publish(fileInfo);
 	}
 }
-
-/**
- {
- "pagedResources" : {
- "links" : [ {
- "rel" : "self",
- "href" : "http://localhost/batch/files{?page,size,sort}"
- } ],
- "content" : [ {
- "timestamp" : "sometimestamp",
- "path" : "foo.txt",
- "shortPath" : "foo.txt",
- "local" : true,
- "deleteCount" : 0,
- "links" : [ {
- "rel" : "self",
- "href" : "http://localhost/batch/files/foo.txt"
- } ]
- }, {
- "timestamp" : "anothertimestamp",
- "path" : "bar/foo.txt",
- "shortPath" : "bar/foo.txt",
- "local" : false,
- "deleteCount" : 0,
- "links" : [ {
- "rel" : "self",
- "href" : "http://localhost/batch/files/bar/foo.txt"
- } ]
- }, {
- "timestamp" : "lasttimestamp",
- "path" : "bar/baz.txt",
- "shortPath" : "bar/baz.txt",
- "local" : true,
- "deleteCount" : 0,
- "links" : [ {
- "rel" : "self",
- "href" : "http://localhost/batch/files/bar/baz.txt"
- } ]
- } ],
- "page" : {
- "size" : 10,
- "totalElements" : 0,
- "totalPages" : 0,
- "number" : 0
- }
- }
- }
- */

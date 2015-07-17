@@ -97,7 +97,7 @@ public class BatchJobExecutionsControllerIntegrationTests extends AbstractContro
 		when(jobService.countJobExecutions()).thenReturn(1);
 
 		mockMvc.perform(
-				get("/batch/executions").param("jobname", "job1").param("startJobInstance", "0").param("pageSize", "20").accept(
+				get("/batch/executions").param("jobname", "job1").param("page", "0").param("pageSize", "20").accept(
 						MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk())
 				.andExpect(jsonPath("$.pagedResources.content", Matchers.hasSize(1)))
 				.andExpect(jsonPath("$.pagedResources.content[0].executionId").value(3))

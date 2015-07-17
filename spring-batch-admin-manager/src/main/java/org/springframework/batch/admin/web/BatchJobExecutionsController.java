@@ -39,7 +39,6 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.PagedResources.PageMetadata;
 import org.springframework.http.HttpStatus;
@@ -60,7 +59,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 @Controller
 @RequestMapping("/batch/executions")
-@ExposesResourceFor(JobExecutionInfoResource.class)
 public class BatchJobExecutionsController extends AbstractBatchJobsController {
 
 	@Autowired
@@ -78,7 +76,7 @@ public class BatchJobExecutionsController extends AbstractBatchJobsController {
 	@ResponseStatus(HttpStatus.OK)
 	public PagedResources<JobExecutionInfoResource> list(Pageable pageable) throws NoSuchJobException {
 
-		Collection<JobExecutionInfoResource> resources = new ArrayList<JobExecutionInfoResource>();
+		Collection<JobExecutionInfoResource> resources = new ArrayList<>();
 
 		for (JobExecution jobExecution : jobService.listJobExecutions(pageable.getOffset(), pageable.getPageSize())) {
 			Job job = jobLocator.getJob(jobExecution.getJobInstance().getJobName());
@@ -88,7 +86,7 @@ public class BatchJobExecutionsController extends AbstractBatchJobsController {
 			resources.add(jobExecutionInfoResource);
 		}
 
-		return new PagedResources<JobExecutionInfoResource>(resources,
+		return new PagedResources<>(resources,
 				new PageMetadata(pageable.getPageSize(), pageable.getPageNumber(),
 						jobService.countJobExecutions()));
 	}
@@ -105,13 +103,13 @@ public class BatchJobExecutionsController extends AbstractBatchJobsController {
 	public PagedResources<JobExecutionInfoResource> executionsForJob(@RequestParam("jobname") String jobName,
 			Pageable pageable) {
 
-		Collection<JobExecutionInfoResource> result = new ArrayList<JobExecutionInfoResource>();
+		Collection<JobExecutionInfoResource> result = new ArrayList<>();
 		try {
 			for (JobExecution jobExecution : jobService.listJobExecutionsForJob(jobName, pageable.getOffset(), pageable.getPageSize())) {
 				result.add(jobExecutionInfoResourceAssembler.toResource(new JobExecutionInfo(jobExecution, timeZone)));
 			}
 
-			return new PagedResources<JobExecutionInfoResource>(result,
+			return new PagedResources<>(result,
 					new PageMetadata(pageable.getPageSize(), pageable.getPageNumber(),
 							jobService.countJobExecutionsForJob(jobName)));
 		}
@@ -131,7 +129,7 @@ public class BatchJobExecutionsController extends AbstractBatchJobsController {
 	public Collection<JobExecutionInfoResource> executionsForJobInstance(@RequestParam("jobinstanceid") long jobInstanceId,
 			@RequestParam("jobname") String jobName) {
 
-		Collection<JobExecutionInfoResource> result = new ArrayList<JobExecutionInfoResource>();
+		Collection<JobExecutionInfoResource> result = new ArrayList<>();
 		try {
 			for (JobExecution jobExecution : jobService.getJobExecutionsForJobInstance(jobName, jobInstanceId)) {
 				result.add(jobExecutionInfoResourceAssembler.toResource(new JobExecutionInfo(jobExecution, timeZone)));
@@ -152,7 +150,7 @@ public class BatchJobExecutionsController extends AbstractBatchJobsController {
 	 */
 	@RequestMapping(value = "", method = RequestMethod.POST, params = "jobname")
 	@ResponseStatus(HttpStatus.CREATED)
-	public void launchJob(@RequestParam("jobname") String name, @RequestParam(value = "jobParameters", required = false) String jobParameters) throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, NoSuchJobException {
+	public void launchJob(@RequestParam("jobname") String name, @RequestParam(value = "jobparameters", required = false) String jobParameters) throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, NoSuchJobException {
 		JobParameters params = new JobParameters();
 		if(jobParameters != null) {
 			JobParametersExtractor extractor = new JobParametersExtractor();
