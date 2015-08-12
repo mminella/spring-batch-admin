@@ -16,15 +16,15 @@
 package org.springframework.batch.admin.web;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.RestDocumentation.document;
+import static org.springframework.restdocs.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -80,13 +80,13 @@ public class BatchFilesApiDocumentation extends AbstractApiDocumentation {
 
 	@Test
  	public void testDelete() throws Exception {
-		when(fileService.delete("*")).thenReturn(3);
+		when(fileService.delete("pattern")).thenReturn(3);
 
 		mockMvc.perform(
-          delete("/batch/files/*").accept(MediaType.APPLICATION_JSON)).andDo(print()).andDo(document("file-delete",
-				responseFields(fieldWithPath("fileInfoResource").description("<<file-resource>>")
-				))).andExpect(status().isOk())
-			 .andExpect(jsonPath("$.fileInfoResource.deleteCount", equalTo(3)));
+				delete("/batch/files/{pattern}", "pattern").accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk())
+				.andExpect(jsonPath("$.fileInfoResource.deleteCount", equalTo(3)))
+				.andDo(document("file-delete", pathParameters(parameterWithName("pattern").description("Pattern describing files to be deleted")),
+						responseFields(fieldWithPath("fileInfoResource").description("<<file-resource>> that describes what was deleted"))));
 	}
 
 	@Ignore
@@ -104,7 +104,7 @@ public class BatchFilesApiDocumentation extends AbstractApiDocumentation {
 				.file(file).param("path", "/foo").accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
 		.andDo(document("file-upload-request",
-				requestFields(fieldWithPath("path").description("where the file should be uploaded to"))));
+				pathParameters(parameterWithName("path").description("where the file should be uploaded to"))));
 
 		verify(fileService).publish(fileInfo);
 	}

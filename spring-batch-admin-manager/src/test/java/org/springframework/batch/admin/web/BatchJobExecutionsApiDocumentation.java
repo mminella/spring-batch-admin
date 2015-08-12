@@ -17,14 +17,15 @@ package org.springframework.batch.admin.web;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.RestDocumentation.document;
+import static org.springframework.restdocs.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -130,45 +131,48 @@ public class BatchJobExecutionsApiDocumentation extends AbstractApiDocumentation
 				responseFields(fieldWithPath("jobExecutionInfoResourceList").description("List of <<job-execution-resource>>"))));
 	}
 
-	@Ignore("request attributes are not supported...need to re-evaluate if shoudl be a 'JobLaunchRequest'")
+	@Ignore("request attributes are not supported...need to re-evaluate if should be a 'JobLaunchRequest'")
 	@Test
 	public void testLaunchAJob() throws Exception {
 		mockMvc.perform(
 				post("/batch/executions").requestAttr("jobname", "job1").requestAttr("jobparameters", "foo=1,bar=baz").accept(MediaType.APPLICATION_JSON))
 				.andDo(print()).andDo(document("launch-job",
-			requestFields(fieldWithPath("jobname").description("name of the job to launch.  JSR-352 based jobs would be the name of the xml file"),
-				fieldWithPath("jobparameters").description("comma delimited list of parameters")))).andExpect(status().isCreated());
+				requestFields(fieldWithPath("jobname").description("name of the job to launch.  JSR-352 based jobs would be the name of the xml file"),
+						fieldWithPath("jobparameters").description("comma delimited list of parameters")))).andExpect(status().isCreated());
 	}
 
-	@Ignore("path parameters are not supported yet.  See https://github.com/spring-projects/spring-restdocs/issues/86")
 	@Test
 	public void testGetJobExecutionInfo() throws Exception {
 		when(jobService.getJobExecution(0l)).thenReturn(execution2);
 		when(jobLocator.getJob("job1")).thenReturn(new JobSupport("job1"));
 
 		mockMvc.perform(
-				get("/batch/executions/0").accept(MediaType.APPLICATION_JSON)).andDo(print()).andDo(document("get-job-execution"));
+				get("/batch/executions/{executionId}", 0l).accept(MediaType.APPLICATION_JSON)).andDo(print()).andDo(document("get-job-execution",
+				pathParameters(parameterWithName("executionId").description("id of the job execution")),
+				responseFields(fieldWithPath("jobExecutionInfoResource").description("A <<job-execution-resource>>"))));
 
 	}
 
-	@Ignore("path parameters are not supported yet.  See https://github.com/spring-projects/spring-restdocs/issues/86")
 	@Test
 	public void testStopJobExecution() throws Exception {
-		mockMvc.perform(put("/batch/executions/{executionId}?stop=true", "0")).andDo(print()).andDo(document("stop-job-execution"));
+		mockMvc.perform(put("/batch/executions/{executionId}?stop=true", "0")).andDo(print()).andDo(document("stop-job-execution",
+				pathParameters(parameterWithName("executionId").description("id of the job execution to stop")),
+				queryParameters(parameterWithName("stop").description("must be true"))));
 	}
 
-	@Ignore("path parameters are not supported yet.  See https://github.com/spring-projects/spring-restdocs/issues/86")
 	@Test
 	public void testRestartJob() throws Exception {
 		when(jobService.getJobExecution(5l)).thenThrow(new NoSuchJobExecutionException("Could not find jobExecution with id 99999"));
 
-		mockMvc.perform(get("/batch/executions/5").accept(MediaType.APPLICATION_JSON))
-				.andDo(print()).andDo(document("restart-job"));
+		mockMvc.perform(get("/batch/executions/{executionId}", 5l).accept(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andDo(document("restart-job",
+						pathParameters(parameterWithName("executionId").description("id of the job execution to restart"))));
 	}
 
 	@Test
 	public void testStopAllJobs() throws Exception {
 		mockMvc.perform(put("/batch/executions?stop=true")).andDo(print()).andDo(document("stop-all-jobs",
-		queryParameters(parameterWithName("stop").description("must equal true")))).andExpect(status().isOk());
+				queryParameters(parameterWithName("stop").description("must equal true")))).andExpect(status().isOk());
 	}
 }

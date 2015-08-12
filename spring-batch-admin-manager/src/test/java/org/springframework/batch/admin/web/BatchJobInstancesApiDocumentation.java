@@ -19,17 +19,17 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.RestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.RestDocumentationRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -74,12 +74,15 @@ public class BatchJobInstancesApiDocumentation extends AbstractApiDocumentation 
 		execution.addStepExecutions(Collections.singletonList(stepExecution));
 	}
 
-	@Ignore("path parameters are not supported yet.  See https://github.com/spring-projects/spring-restdocs/issues/86")
 	@Test
 	public void testGetJobInstance() throws Exception {
-		mockMvc.perform(
-				get("/batch/instances/0").accept(MediaType.APPLICATION_JSON)).andDo(print()).andDo(document("get-job-instance"));
+		when(jobService.getJobInstance(0)).thenReturn(jobInstance);
+		when(jobService.getJobExecutionsForJobInstance(jobInstance.getJobName(), jobInstance.getId())).thenReturn(Collections.singletonList(execution));
 
+		mockMvc.perform(
+				get("/batch/instances/{instanceId}", 0l).accept(MediaType.APPLICATION_JSON)).andDo(print()).andDo(document("get-job-instance",
+				pathParameters(parameterWithName("instanceId").description("id of the job instance to obtain")),
+				responseFields(fieldWithPath("jobInstanceInfoResource").description("A <<job-instance-resource>>"))));
 	}
 
 	@Test
@@ -98,7 +101,7 @@ public class BatchJobInstancesApiDocumentation extends AbstractApiDocumentation 
 						parameterWithName("page").description("Requested page index (0 based)"),
 						parameterWithName("size").description("Number of elements per page")),
 				responseFields(fieldWithPath("pagedResources.page").description("<<overview-pagination-response>>"),
-					fieldWithPath("pagedResources.content").description("Array of <<job-instance-resource>>"),
-					fieldWithPath("pagedResources.links").description("Links to the current page of <<job-instance-resource>>"))));
+						fieldWithPath("pagedResources.content").description("Array of <<job-instance-resource>>"),
+						fieldWithPath("pagedResources.links").description("Links to the current page of <<job-instance-resource>>"))));
 	}
 }

@@ -17,20 +17,19 @@ package org.springframework.batch.admin.web;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.RestDocumentation.document;
+import static org.springframework.restdocs.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.TimeZone;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -51,8 +50,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 public class BatchJobsApiDocumentation extends AbstractApiDocumentation {
 
 	private JobExecution execution;
-
-	private TimeZone timeZone = TimeZone.getTimeZone("UTC");
 
 	@Before
 	public void before() throws Exception {
@@ -88,7 +85,6 @@ public class BatchJobsApiDocumentation extends AbstractApiDocumentation {
 						fieldWithPath("pagedResources.links").description("Links to the current page of <<job-detail-resource>>"))));
 	}
 
-	@Ignore("path parameters are not supported yet.  See https://github.com/spring-projects/spring-restdocs/issues/86")
 	@Test
 	public void testJobInfo() throws Exception {
 		when(jobService.isLaunchable("job1")).thenReturn(false);
@@ -99,9 +95,9 @@ public class BatchJobsApiDocumentation extends AbstractApiDocumentation {
 		when(jobService.listJobExecutionsForJob("job1", 0, 1)).thenReturn(Collections.singletonList(jobExecution));
 
 		mockMvc.perform(
-				get("/batch/configurations/job1")
-						.param("startJobInstance", "0")
-						.param("pageSize", "20")
-						.accept(MediaType.APPLICATION_JSON)).andDo(print()).andDo(document("job-detail-by-job"));
+				get("/batch/configurations/{jobName}", "job1")
+						.accept(MediaType.APPLICATION_JSON)).andDo(print()).andDo(document("job-detail-by-job",
+				pathParameters(parameterWithName("jobName").description("name of the job requested")),
+				responseFields(fieldWithPath("detailedJobInfoResource").description("requested <<job-detail-resource>>"))));
 	}
 }
