@@ -18,7 +18,10 @@ package org.springframework.batch.admin.web;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.RestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -90,12 +93,12 @@ public class BatchJobExecutionsApiDocumentation extends AbstractApiDocumentation
 
 		mockMvc.perform(
 				get("/batch/executions").param("page", "1").param("size", "5").accept(
-						MediaType.APPLICATION_JSON)).andDo(print()).andDo(document("job-executions-list")
-				.withQueryParameters(parameterWithName("page").description("Requested page index (0 based)"),
-						parameterWithName("size").description("Number of elements per page"))
-				.withResponseFields(fieldWithPath("pagedResources.page").description("<<overview-pagination-response>>"),
+						MediaType.APPLICATION_JSON)).andDo(print()).andDo(document("job-executions-list",
+				queryParameters(parameterWithName("page").description("Requested page index (0 based)"),
+						parameterWithName("size").description("Number of elements per page")),
+				responseFields(fieldWithPath("pagedResources.page").description("<<overview-pagination-response>>"),
 						fieldWithPath("pagedResources.content").description("Array of <<job-execution-resource>>"),
-						fieldWithPath("pagedResources.links").description("Links to the current page of <<job-execution-resource>>")));
+						fieldWithPath("pagedResources.links").description("Links to the current page of <<job-execution-resource>>"))));
 	}
 
 	@Test
@@ -106,13 +109,13 @@ public class BatchJobExecutionsApiDocumentation extends AbstractApiDocumentation
 
 		mockMvc.perform(
 				get("/batch/executions").param("jobname", "job1").param("page", "0").param("size", "20").accept(
-						MediaType.APPLICATION_JSON)).andDo(print()).andDo(document("job-executions-by-name")
-				.withQueryParameters(parameterWithName("jobname").description("the name of the job"),
+						MediaType.APPLICATION_JSON)).andDo(print()).andDo(document("job-executions-by-name",
+				queryParameters(parameterWithName("jobname").description("the name of the job"),
 						parameterWithName("page").description("Requested page index (0 based)"),
-						parameterWithName("size").description("Number of elements per page"))
-				.withResponseFields(fieldWithPath("pagedResources.page").description("<<overview-pagination-response>>"),
+						parameterWithName("size").description("Number of elements per page")),
+				responseFields(fieldWithPath("pagedResources.page").description("<<overview-pagination-response>>"),
 						fieldWithPath("pagedResources.content").description("Array of <<job-execution-resource>>"),
-						fieldWithPath("pagedResources.links").description("Links to the current page of <<job-execution-resource>>")));
+						fieldWithPath("pagedResources.links").description("Links to the current page of <<job-execution-resource>>"))));
 	}
 
 	@Test
@@ -121,10 +124,10 @@ public class BatchJobExecutionsApiDocumentation extends AbstractApiDocumentation
 
 		mockMvc.perform(
 				get("/batch/executions").param("jobinstanceid", "5").param("jobname", "job1")
-				.accept(MediaType.APPLICATION_JSON)).andDo(print()).andDo(document("job-executions-by-instance-id")
-		.withQueryParameters(parameterWithName("jobinstanceid").description("id of the job instance"),
-				parameterWithName("jobname").description("name of the job"))
-		.withResponseFields(fieldWithPath("jobExecutionInfoResourceList").description("List of <<job-execution-resource>>")));
+				.accept(MediaType.APPLICATION_JSON)).andDo(print()).andDo(document("job-executions-by-instance-id",
+				queryParameters(parameterWithName("jobinstanceid").description("id of the job instance"),
+						parameterWithName("jobname").description("name of the job")),
+				responseFields(fieldWithPath("jobExecutionInfoResourceList").description("List of <<job-execution-resource>>"))));
 	}
 
 	@Ignore("request attributes are not supported...need to re-evaluate if shoudl be a 'JobLaunchRequest'")
@@ -132,9 +135,9 @@ public class BatchJobExecutionsApiDocumentation extends AbstractApiDocumentation
 	public void testLaunchAJob() throws Exception {
 		mockMvc.perform(
 				post("/batch/executions").requestAttr("jobname", "job1").requestAttr("jobparameters", "foo=1,bar=baz").accept(MediaType.APPLICATION_JSON))
-				.andDo(print()).andDo(document("launch-job")
-		.withRequestFields(fieldWithPath("jobname").description("name of the job to launch.  JSR-352 based jobs would be the name of the xml file"),
-				fieldWithPath("jobparameters").description("comma delimited list of parameters"))).andExpect(status().isCreated());
+				.andDo(print()).andDo(document("launch-job",
+			requestFields(fieldWithPath("jobname").description("name of the job to launch.  JSR-352 based jobs would be the name of the xml file"),
+				fieldWithPath("jobparameters").description("comma delimited list of parameters")))).andExpect(status().isCreated());
 	}
 
 	@Ignore("path parameters are not supported yet.  See https://github.com/spring-projects/spring-restdocs/issues/86")
@@ -165,7 +168,7 @@ public class BatchJobExecutionsApiDocumentation extends AbstractApiDocumentation
 
 	@Test
 	public void testStopAllJobs() throws Exception {
-		mockMvc.perform(put("/batch/executions?stop=true")).andDo(print()).andDo(document("stop-all-jobs")
-		.withQueryParameters(parameterWithName("stop").description("must equal true"))).andExpect(status().isOk());
+		mockMvc.perform(put("/batch/executions?stop=true")).andDo(print()).andDo(document("stop-all-jobs",
+		queryParameters(parameterWithName("stop").description("must equal true")))).andExpect(status().isOk());
 	}
 }

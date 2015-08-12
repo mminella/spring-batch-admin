@@ -20,7 +20,10 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.RestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -67,12 +70,12 @@ public class BatchFilesApiDocumentation extends AbstractApiDocumentation {
 		when(fileService.getFiles(0, 10)).thenReturn(files);
 
 		mockMvc.perform(
-				get("/batch/files").param("page", "0").param("size", "10").accept(MediaType.APPLICATION_JSON)).andDo(document("file-list")
-                .withQueryParameters(parameterWithName("page").description("Requested page index (0 based)"),
-                        parameterWithName("size").description("Number of elements per page"))
-                .withResponseFields(fieldWithPath("pagedResources.page").description("<<overview-pagination-response>>"),
-                        fieldWithPath("pagedResources.content").description("Array of <<file-resource>>"),
-                        fieldWithPath("pagedResources.links").description("Links to the current page of <<file-resource>>")));
+				get("/batch/files").param("page", "0").param("size", "10").accept(MediaType.APPLICATION_JSON)).andDo(document("file-list",
+				queryParameters(parameterWithName("page").description("Requested page index (0 based)"),
+						parameterWithName("size").description("Number of elements per page")),
+				responseFields(fieldWithPath("pagedResources.page").description("<<overview-pagination-response>>"),
+						fieldWithPath("pagedResources.content").description("Array of <<file-resource>>"),
+						fieldWithPath("pagedResources.links").description("Links to the current page of <<file-resource>>"))));
 	}
 
 	@Test
@@ -80,10 +83,9 @@ public class BatchFilesApiDocumentation extends AbstractApiDocumentation {
 		when(fileService.delete("*")).thenReturn(3);
 
 		mockMvc.perform(
-          delete("/batch/files/*").accept(MediaType.APPLICATION_JSON)).andDo(print()).andDo(document("file-delete")
-			 .withResponseFields(
-					 fieldWithPath("fileInfoResource").description("<<file-resource>>")
-			 )).andExpect(status().isOk())
+          delete("/batch/files/*").accept(MediaType.APPLICATION_JSON)).andDo(print()).andDo(document("file-delete",
+				responseFields(fieldWithPath("fileInfoResource").description("<<file-resource>>")
+				))).andExpect(status().isOk())
 			 .andExpect(jsonPath("$.fileInfoResource.deleteCount", equalTo(3)));
 	}
 
@@ -101,7 +103,8 @@ public class BatchFilesApiDocumentation extends AbstractApiDocumentation {
 		mockMvc.perform(MockMvcRequestBuilders.fileUpload("/batch/files")
 				.file(file).param("path", "/foo").accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
-		.andDo(document("file-upload-request").withRequestFields(fieldWithPath("path").description("where the file should be uploaded to")));
+		.andDo(document("file-upload-request",
+				requestFields(fieldWithPath("path").description("where the file should be uploaded to"))));
 
 		verify(fileService).publish(fileInfo);
 	}

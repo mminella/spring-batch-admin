@@ -18,6 +18,8 @@ package org.springframework.batch.admin.web;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.RestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
@@ -86,12 +88,17 @@ public class BatchJobInstancesApiDocumentation extends AbstractApiDocumentation 
 		when(jobService.getJobExecutionsForJobInstance(jobInstance.getJobName(), jobInstance.getId())).thenReturn(Collections.singletonList(execution));
 
 		mockMvc.perform(
-				get("/batch/instances").param("jobname", "job1").param("page", "0").param("size", "20").accept(MediaType.APPLICATION_JSON)).andDo(print()).andDo(document("instances-for-job")
-		.withQueryParameters(parameterWithName("jobname").description("name of the job"),
-				parameterWithName("page").description("Requested page index (0 based)"),
-				parameterWithName("size").description("Number of elements per page"))
-		.withResponseFields(fieldWithPath("pagedResources.page").description("<<overview-pagination-response>>"),
-				fieldWithPath("pagedResources.content").description("Array of <<job-instance-resource>>"),
-				fieldWithPath("pagedResources.links").description("Links to the current page of <<job-instance-resource>>")));
+				get("/batch/instances")
+						.param("jobname", "job1")
+						.param("page", "0")
+						.param("size", "20")
+						.accept(MediaType.APPLICATION_JSON))
+				.andDo(print()).andDo(document("instances-for-job",
+				queryParameters(parameterWithName("jobname").description("name of the job"),
+						parameterWithName("page").description("Requested page index (0 based)"),
+						parameterWithName("size").description("Number of elements per page")),
+				responseFields(fieldWithPath("pagedResources.page").description("<<overview-pagination-response>>"),
+					fieldWithPath("pagedResources.content").description("Array of <<job-instance-resource>>"),
+					fieldWithPath("pagedResources.links").description("Links to the current page of <<job-instance-resource>>"))));
 	}
 }
