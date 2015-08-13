@@ -563,7 +563,8 @@ include::{snippets}/instances-for-job/http-response.adoc[]
 
 [[job-detail]]
 == Jobs
-The Jobs service provides access to information
+The Jobs service provides access to information about jobs known to this instance of
+Spring Batch Admin
 
 [[job-detail-resource]]
 === JobDetail
@@ -638,6 +639,193 @@ include::{snippets}/jobs/response-fields.adoc[]
 ==== Example Response
 
 include::{snippets}/jobs/http-response.adoc[]
+
+
+[[step]]
+== Step
+The Step service provides the ability to query the job repository about previously
+executed step executions.
+
+[[step-progress-resource]]
+=== Step Execution Progress
+This resource extends <<step-execution-resource>>.  Only the additional fields are
+documented below.
+
+|===
+|field|Type|Description
+
+|percentageComplete
+|double
+|percentage complete based on historical durations
+
+|finished
+|boolean
+|true if the step execution is complete
+
+|duration
+|double
+|duration of the step
+
+|stepExecutionHistory
+|StepExecutionHistory
+|A <<step-execution-history>>
+
+|===
+
+
+[[step-execution-history]]
+=== Step Execution History
+This resource represents historical data on the step.
+
+|===
+|field|Type|Description
+
+|stepName
+|String
+|name of the step
+
+|count
+|int
+|number of times the step has been executed
+
+|commitCount
+|CumulativeHistory
+|the history of the `commitCount` metric for this step
+
+|rollbackCount
+|CumulativeHistory
+|the history of the `rollbackCount` metric for this step
+
+|readCount
+|CumulativeHistory
+|the history of the `readCount` metric for this step
+
+|writeCount
+|CumulativeHistory
+|the history of the `writeCount` metric for this step
+
+|filterCount
+|CumulativeHistory
+|the history of the `filterCount` metric for this step
+
+|readSkipCount
+|CumulativeHistory
+|the history of the `readSkipCount` metric for this step
+
+|writeSkipCount
+|CumulativeHistory
+|the history of the `writeSkipCount` metric for this step
+
+|processSkipCount
+|CumulativeHistory
+|the history of the `processSkipCount` metric for this step
+
+|duration
+|CumulativeHistory
+|the history of the `duration` metric for this step
+
+|durationPerRead
+|CumulativeHistory
+|the history of the `durationPerRead` metric for this step
+
+|===
+
+
+[[cumulative-history]]
+=== CumulativeHistory
+A representation of standard statistical values for a given metric
+
+|===
+|field|Type|Description
+
+|count
+|int
+|number of times the event occurred
+
+|mean
+|double
+|The mean of the metric's value
+
+|standardDeviation
+|double
+|the standard deviation of the metric's value
+
+|max
+|double
+|the max value observed for the metric
+
+|min
+|double
+|the min value observed for the metric
+|===
+
+
+[[list-steps]]
+=== Accessing the list of steps for a job execution
+
+A `GET` request is used to access the list of steps
+
+==== Query parameters
+
+include::{snippets}/step-executions-list/path-parameters.adoc[]
+
+==== Example request
+
+include::{snippets}/step-executions-list/curl-request.adoc[]
+
+==== Response structure
+
+include::{snippets}/step-executions-list/response-fields.adoc[]
+
+==== Example Response
+
+include::{snippets}/step-executions-list/http-response.adoc[]
+
+
+[[details-steps]]
+=== Accessing a specific step execution
+
+A `GET` request is used to access the step execution
+
+==== Query parameters
+
+include::{snippets}/step-executions-details/path-parameters.adoc[]
+
+==== Example request
+
+include::{snippets}/step-executions-details/curl-request.adoc[]
+
+==== Response structure
+
+include::{snippets}/step-executions-details/response-fields.adoc[]
+
+==== Example Response
+
+include::{snippets}/step-executions-details/http-response.adoc[]
+
+
+
+[[progress-steps]]
+=== Accessing the progress of a step execution
+
+A `GET` request is used to the progress
+
+==== Query parameters
+
+include::{snippets}/step-execution-progress/path-parameters.adoc[]
+
+==== Example request
+
+include::{snippets}/step-execution-progress/curl-request.adoc[]
+
+==== Response structure
+
+include::{snippets}/step-execution-progress/response-fields.adoc[]
+
+==== Example Response
+
+include::{snippets}/step-execution-progress/http-response.adoc[]
+
 
 
 
