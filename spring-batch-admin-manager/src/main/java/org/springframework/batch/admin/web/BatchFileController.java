@@ -90,7 +90,6 @@ public class BatchFileController extends AbstractBatchJobsController {
 		}
 
 		try {
-			System.out.println("path = " + path);
 			FileInfo dest = fileService.createFile(path + "/" + originalFilename);
 			file.transferTo(fileService.getResource(dest.getPath()).getFile());
 			fileService.publish(dest);
@@ -110,6 +109,7 @@ public class BatchFileController extends AbstractBatchJobsController {
 				logger.info(message);
 			}
 			return null;
+
 //			errors.reject("file.upload.failed.downstream", new Object[] { originalFilename }, message);
 		}
 	}
