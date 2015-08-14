@@ -20,7 +20,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.RestDocumentation.document;
 import static org.springframework.restdocs.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.RestDocumentationRequestBuilders.fileUpload;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
@@ -47,7 +49,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 /**
  * @author Michael Minella
@@ -89,7 +90,7 @@ public class BatchFilesApiDocumentation extends AbstractApiDocumentation {
 						responseFields(fieldWithPath("fileInfoResource").description("<<file-resource>> that describes what was deleted"))));
 	}
 
-	@Ignore
+	@Ignore("Multipart requests are not yet supported.  See https://github.com/spring-projects/spring-restdocs/issues/104")
 	@Test
 	public void testUploadRequest() throws Exception {
 		File tempFile = File.createTempFile("result", "txt");
@@ -100,11 +101,14 @@ public class BatchFilesApiDocumentation extends AbstractApiDocumentation {
 
 		MockMultipartFile file = new MockMultipartFile("file", "bar.txt", "text/plain", "bar".getBytes());
 
-		mockMvc.perform(MockMvcRequestBuilders.fileUpload("/batch/files")
+		mockMvc.perform(fileUpload("/batch/files")
 				.file(file).param("path", "/foo").accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
 		.andDo(document("file-upload-request",
-				pathParameters(parameterWithName("path").description("where the file should be uploaded to"))));
+				requestFields(fieldWithPath("file").description("file to be uploaded"),
+						fieldWithPath("path").description("foo"))//,
+//				queryParameters(parameterWithName("path").description("where the file should be stored"))
+		));
 
 		verify(fileService).publish(fileInfo);
 	}
