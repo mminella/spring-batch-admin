@@ -175,6 +175,28 @@ include::{snippets}/file-upload-request/response-fields.adoc[]
 
 include::{snippets}/file-upload-request/http-response.adoc[]
 
+[[file-upload-request-path]]
+=== Uploading a file v2
+
+A `POST` request is used to upload a file
+
+==== Path parameters
+Additional parameters besides the file parameter itself.
+
+include::{snippets}/file-upload-request-path/path-parameters.adoc[]
+
+==== Example request
+
+include::{snippets}/file-upload-request-path/curl-request.adoc[]
+
+==== Response structure
+
+include::{snippets}/file-upload-request-path/response-fields.adoc[]
+
+==== Example Response
+
+include::{snippets}/file-upload-request-path/http-response.adoc[]
+
 
 [[job-execution]]
 == JobExecutions

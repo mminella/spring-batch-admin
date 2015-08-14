@@ -90,6 +90,7 @@ public class BatchFileController extends AbstractBatchJobsController {
 		}
 
 		try {
+			System.out.println("path = " + path);
 			FileInfo dest = fileService.createFile(path + "/" + originalFilename);
 			file.transferTo(fileService.getResource(dest.getPath()).getFile());
 			fileService.publish(dest);

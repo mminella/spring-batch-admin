@@ -107,4 +107,24 @@ public class BatchFilesApiDocumentation extends AbstractApiDocumentation {
 
 		verify(fileService).publish(fileInfo);
 	}
+
+	@Test
+	public void testUploadRequestPathParam() throws Exception {
+		File tempFile = File.createTempFile("result", "txt");
+
+		FileInfo fileInfo = new FileInfo(tempFile.getPath());
+		when(fileService.createFile("foo/baz.txt")).thenReturn(fileInfo);
+		when(fileService.getResource(tempFile.getPath())).thenReturn(new FileSystemResource(tempFile));
+
+		MockMultipartFile file = new MockMultipartFile("file", "baz.txt", "text/plain", "baz".getBytes());
+
+		mockMvc.perform(fileUpload("/batch/files/{path}", "foo")
+				.file(file).accept(MediaType.APPLICATION_JSON))
+				.andDo(print())
+		.andDo(document("file-upload-request-path",
+				responseFields(fieldWithPath("fileInfoResource").description("<<file-resource>> representing the new file")),
+				pathParameters(parameterWithName("path").description("path to where the file should reside"))));
+
+		verify(fileService).publish(fileInfo);
+	}
 }
