@@ -158,7 +158,8 @@ include::{snippets}/file-delete/http-response.adoc[]
 
 A `POST` request is used to upload a file
 
-==== Query parameters
+==== Request parameters
+Additional parameters besides the file parameter itself.
 
 include::{snippets}/file-upload-request/query-parameters.adoc[]
 

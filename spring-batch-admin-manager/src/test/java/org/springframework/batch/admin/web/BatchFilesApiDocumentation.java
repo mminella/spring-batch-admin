@@ -22,7 +22,6 @@ import static org.springframework.restdocs.RestDocumentation.document;
 import static org.springframework.restdocs.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.RestDocumentationRequestBuilders.fileUpload;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
@@ -36,7 +35,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -90,7 +88,6 @@ public class BatchFilesApiDocumentation extends AbstractApiDocumentation {
 						responseFields(fieldWithPath("fileInfoResource").description("<<file-resource>> that describes what was deleted"))));
 	}
 
-	@Ignore("Multipart requests are not yet supported.  See https://github.com/spring-projects/spring-restdocs/issues/104")
 	@Test
 	public void testUploadRequest() throws Exception {
 		File tempFile = File.createTempFile("result", "txt");
@@ -105,10 +102,8 @@ public class BatchFilesApiDocumentation extends AbstractApiDocumentation {
 				.file(file).param("path", "/foo").accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
 		.andDo(document("file-upload-request",
-				requestFields(fieldWithPath("file").description("file to be uploaded"),
-						fieldWithPath("path").description("foo"))//,
-//				queryParameters(parameterWithName("path").description("where the file should be stored"))
-		));
+				responseFields(fieldWithPath("fileInfoResource").description("<<file-resource>> representing the new file")),
+				queryParameters(parameterWithName("path").description("path to where the file should reside"))));
 
 		verify(fileService).publish(fileInfo);
 	}
