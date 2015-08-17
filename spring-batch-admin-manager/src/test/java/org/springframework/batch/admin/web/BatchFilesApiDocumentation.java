@@ -61,7 +61,7 @@ public class BatchFilesApiDocumentation extends AbstractApiDocumentation {
 
 	@Test
 	public void testList() throws Exception {
-		List<FileInfo> files = new ArrayList<>();
+		List<FileInfo> files = new ArrayList<FileInfo>();
 		files.add(new FileInfo("foo.txt", "sometimestamp", true, 0));
 		files.add(new FileInfo("bar/foo.txt", "anothertimestamp", false, 0));
 		files.add(new FileInfo("bar/baz.txt", "lasttimestamp", true, 0));

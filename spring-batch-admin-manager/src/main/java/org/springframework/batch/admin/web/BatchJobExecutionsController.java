@@ -76,7 +76,7 @@ public class BatchJobExecutionsController extends AbstractBatchJobsController {
 	@ResponseStatus(HttpStatus.OK)
 	public PagedResources<JobExecutionInfoResource> list(Pageable pageable) throws NoSuchJobException {
 
-		Collection<JobExecutionInfoResource> resources = new ArrayList<>();
+		Collection<JobExecutionInfoResource> resources = new ArrayList<JobExecutionInfoResource>();
 
 		for (JobExecution jobExecution : jobService.listJobExecutions(pageable.getOffset(), pageable.getPageSize())) {
 			Job job = jobLocator.getJob(jobExecution.getJobInstance().getJobName());
@@ -86,7 +86,7 @@ public class BatchJobExecutionsController extends AbstractBatchJobsController {
 			resources.add(jobExecutionInfoResource);
 		}
 
-		return new PagedResources<>(resources,
+		return new PagedResources<JobExecutionInfoResource>(resources,
 				new PageMetadata(pageable.getPageSize(), pageable.getPageNumber(),
 						jobService.countJobExecutions()));
 	}
@@ -103,13 +103,13 @@ public class BatchJobExecutionsController extends AbstractBatchJobsController {
 	public PagedResources<JobExecutionInfoResource> executionsForJob(@RequestParam("jobname") String jobName,
 			Pageable pageable) {
 
-		Collection<JobExecutionInfoResource> result = new ArrayList<>();
+		Collection<JobExecutionInfoResource> result = new ArrayList<JobExecutionInfoResource>();
 		try {
 			for (JobExecution jobExecution : jobService.listJobExecutionsForJob(jobName, pageable.getOffset(), pageable.getPageSize())) {
 				result.add(jobExecutionInfoResourceAssembler.toResource(new JobExecutionInfo(jobExecution, timeZone)));
 			}
 
-			return new PagedResources<>(result,
+			return new PagedResources<JobExecutionInfoResource>(result,
 					new PageMetadata(pageable.getPageSize(), pageable.getPageNumber(),
 							jobService.countJobExecutionsForJob(jobName)));
 		}
@@ -129,7 +129,7 @@ public class BatchJobExecutionsController extends AbstractBatchJobsController {
 	public Collection<JobExecutionInfoResource> executionsForJobInstance(@RequestParam("jobinstanceid") long jobInstanceId,
 			@RequestParam("jobname") String jobName) {
 
-		Collection<JobExecutionInfoResource> result = new ArrayList<>();
+		Collection<JobExecutionInfoResource> result = new ArrayList<JobExecutionInfoResource>();
 		try {
 			for (JobExecution jobExecution : jobService.getJobExecutionsForJobInstance(jobName, jobInstanceId)) {
 				result.add(jobExecutionInfoResourceAssembler.toResource(new JobExecutionInfo(jobExecution, timeZone)));

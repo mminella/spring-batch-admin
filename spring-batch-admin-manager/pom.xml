@@ -268,22 +268,22 @@ visualization of Batch meta data, and also launching and stopping jobs inside th
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.6</source>
+					<target>1.6</target>
 				</configuration>
-				<!--<executions>-->
-					<!--<execution>-->
-						<!--<id>test-compile</id>-->
-						<!--<phase>process-test-sources</phase>-->
-						<!--<goals>-->
-							<!--<goal>testCompile</goal>-->
-						<!--</goals>-->
-						<!--<configuration>-->
-							<!--<source>1.7</source>-->
-							<!--<target>1.7</target>-->
-						<!--</configuration>-->
-					<!--</execution>-->
-				<!--</executions>-->
+				<executions>
+					<execution>
+						<id>test-compile</id>
+						<phase>process-test-sources</phase>
+						<goals>
+							<goal>testCompile</goal>
+						</goals>
+						<configuration>
+							<source>1.7</source>
+							<target>1.7</target>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.mortbay.jetty</groupId>

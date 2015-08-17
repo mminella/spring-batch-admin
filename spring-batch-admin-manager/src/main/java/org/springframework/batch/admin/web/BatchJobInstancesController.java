@@ -92,7 +92,7 @@ public class BatchJobInstancesController extends AbstractBatchJobsController {
 	public PagedResources<JobInstanceInfoResource> instancesForJob(Pageable pageable, PagedResourcesAssembler<JobInstanceInfo> assembler, @RequestParam("jobname") String jobName) {
 
 		try {
-			List<JobInstanceInfo> result = new ArrayList<>();
+			List<JobInstanceInfo> result = new ArrayList<JobInstanceInfo>();
 			long total = jobService.countJobInstances(jobName);
 
 			Collection<JobInstance> jobInstances = jobService.listJobInstances(jobName, pageable.getOffset(), pageable.getPageSize());
@@ -102,7 +102,7 @@ public class BatchJobInstancesController extends AbstractBatchJobsController {
 				result.add(new JobInstanceInfo(jobInstance, jobExecutions));
 			}
 
-			return assembler.toResource(new PageImpl<>(result, pageable, total), jobInstanceInfoResourceAssembler);
+			return assembler.toResource(new PageImpl<JobInstanceInfo>(result, pageable, total), jobInstanceInfoResourceAssembler);
 		}
 		catch (NoSuchJobException e) {
 			throw new NoSuchBatchJobException(jobName);
