@@ -24,7 +24,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -95,7 +95,7 @@ public class BatchJobExecutionsApiDocumentation extends AbstractApiDocumentation
 		mockMvc.perform(
 				get("/batch/executions").param("page", "1").param("size", "5").accept(
 						MediaType.APPLICATION_JSON)).andDo(print()).andDo(document("job-executions-list",
-				queryParameters(parameterWithName("page").description("Requested page index (0 based)"),
+				requestParameters(parameterWithName("page").description("Requested page index (0 based)"),
 						parameterWithName("size").description("Number of elements per page")),
 				responseFields(fieldWithPath("pagedResources.page").description("<<overview-pagination-response>>"),
 						fieldWithPath("pagedResources.content").description("Array of <<job-execution-resource>>"),
@@ -111,7 +111,7 @@ public class BatchJobExecutionsApiDocumentation extends AbstractApiDocumentation
 		mockMvc.perform(
 				get("/batch/executions").param("jobname", "job1").param("page", "0").param("size", "20").accept(
 						MediaType.APPLICATION_JSON)).andDo(print()).andDo(document("job-executions-by-name",
-				queryParameters(parameterWithName("jobname").description("the name of the job"),
+				requestParameters(parameterWithName("jobname").description("the name of the job"),
 						parameterWithName("page").description("Requested page index (0 based)"),
 						parameterWithName("size").description("Number of elements per page")),
 				responseFields(fieldWithPath("pagedResources.page").description("<<overview-pagination-response>>"),
@@ -126,7 +126,7 @@ public class BatchJobExecutionsApiDocumentation extends AbstractApiDocumentation
 		mockMvc.perform(
 				get("/batch/executions").param("jobinstanceid", "5").param("jobname", "job1")
 				.accept(MediaType.APPLICATION_JSON)).andDo(print()).andDo(document("job-executions-by-instance-id",
-				queryParameters(parameterWithName("jobinstanceid").description("id of the job instance"),
+				requestParameters(parameterWithName("jobinstanceid").description("id of the job instance"),
 						parameterWithName("jobname").description("name of the job")),
 				responseFields(fieldWithPath("jobExecutionInfoResourceList").description("List of <<job-execution-resource>>"))));
 	}
@@ -157,7 +157,7 @@ public class BatchJobExecutionsApiDocumentation extends AbstractApiDocumentation
 	public void testStopJobExecution() throws Exception {
 		mockMvc.perform(put("/batch/executions/{executionId}?stop=true", "0")).andDo(print()).andDo(document("stop-job-execution",
 				pathParameters(parameterWithName("executionId").description("id of the job execution to stop")),
-				queryParameters(parameterWithName("stop").description("must be true"))));
+				requestParameters(parameterWithName("stop").description("must be true"))));
 	}
 
 	@Test
@@ -173,6 +173,6 @@ public class BatchJobExecutionsApiDocumentation extends AbstractApiDocumentation
 	@Test
 	public void testStopAllJobs() throws Exception {
 		mockMvc.perform(put("/batch/executions?stop=true")).andDo(print()).andDo(document("stop-all-jobs",
-				queryParameters(parameterWithName("stop").description("must equal true")))).andExpect(status().isOk());
+				requestParameters(parameterWithName("stop").description("must equal true")))).andExpect(status().isOk());
 	}
 }

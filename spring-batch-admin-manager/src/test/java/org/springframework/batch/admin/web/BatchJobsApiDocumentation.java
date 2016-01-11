@@ -22,7 +22,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 import java.util.Arrays;
@@ -78,8 +78,8 @@ public class BatchJobsApiDocumentation extends AbstractApiDocumentation {
 		mockMvc.perform(
 				get("/batch/configurations").param("page", "0").param("size", "10")
 				.accept(MediaType.APPLICATION_JSON)).andDo(print()).andDo(document("jobs",
-				queryParameters(parameterWithName("page").description("Requested page index (0 based)"),
-					parameterWithName("size").description("Number of elements per page")),
+				requestParameters(parameterWithName("page").description("Requested page index (0 based)"),
+						parameterWithName("size").description("Number of elements per page")),
 				responseFields(fieldWithPath("pagedResources.page").description("<<overview-pagination-response>>"),
 						fieldWithPath("pagedResources.content").description("Array of <<job-detail-resource>>"),
 						fieldWithPath("pagedResources.links").description("Links to the current page of <<job-detail-resource>>"))));

@@ -12,14 +12,15 @@
 
 	<bean class="org.springframework.batch.admin.web.resources.DummyMenu"/>
 
-	<bean id="secondary" parent="standard">
-		<property name="attributes">
-			<props merge="true">
-				<prop key="body">/layouts/html/home.ftl</prop>
-				<prop key="side">/layouts/html/side.ftl</prop>
-			</props>
-		</property>
-	</bean>
+	<!--<bean id="secondary" class="org.springframework.batch.admin.web.freemarker.AjaxFreeMarkerView">-->
+		<!--<property name="url" value="/layouts/html/standard.ftl"/>-->
+		<!--<property name="attributes">-->
+			<!--<props merge="true">-->
+				<!--<prop key="body">/layouts/html/home.ftl</prop>-->
+				<!--<prop key="side">/layouts/html/side.ftl</prop>-->
+			<!--</props>-->
+		<!--</property>-->
+	<!--</bean>-->
 	
 	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename" value="messages"/>

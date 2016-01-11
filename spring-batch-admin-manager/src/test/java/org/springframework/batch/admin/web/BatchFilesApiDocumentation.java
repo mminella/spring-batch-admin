@@ -25,7 +25,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -70,7 +70,7 @@ public class BatchFilesApiDocumentation extends AbstractApiDocumentation {
 
 		mockMvc.perform(
 				get("/batch/files").param("page", "0").param("size", "10").accept(MediaType.APPLICATION_JSON)).andDo(document("file-list",
-				queryParameters(parameterWithName("page").description("Requested page index (0 based)"),
+				requestParameters(parameterWithName("page").description("Requested page index (0 based)"),
 						parameterWithName("size").description("Number of elements per page")),
 				responseFields(fieldWithPath("pagedResources.page").description("<<overview-pagination-response>>"),
 						fieldWithPath("pagedResources.content").description("Array of <<file-resource>>"),
@@ -103,7 +103,7 @@ public class BatchFilesApiDocumentation extends AbstractApiDocumentation {
 				.andDo(print())
 		.andDo(document("file-upload-request",
 				responseFields(fieldWithPath("fileInfoResource").description("<<file-resource>> representing the new file")),
-				queryParameters(parameterWithName("path").description("path to where the file should reside"))));
+				requestParameters(parameterWithName("path").description("path to where the file should reside"))));
 
 		verify(fileService).publish(fileInfo);
 	}

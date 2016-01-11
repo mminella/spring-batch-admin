@@ -21,8 +21,8 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.restdocs.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 import java.util.Arrays;
@@ -97,7 +97,7 @@ public class BatchJobInstancesApiDocumentation extends AbstractApiDocumentation 
 						.param("size", "20")
 						.accept(MediaType.APPLICATION_JSON))
 				.andDo(print()).andDo(document("instances-for-job",
-				queryParameters(parameterWithName("jobname").description("name of the job"),
+				requestParameters(parameterWithName("jobname").description("name of the job"),
 						parameterWithName("page").description("Requested page index (0 based)"),
 						parameterWithName("size").description("Number of elements per page")),
 				responseFields(fieldWithPath("pagedResources.page").description("<<overview-pagination-response>>"),
